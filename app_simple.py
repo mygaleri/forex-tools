@@ -181,17 +181,18 @@ with tab2:
     if data:
         df = pd.DataFrame(data)
         
-        # Fungsi pembantu untuk mewarnai baris berdasarkan status Sinyal
-        def color_signal(row):
-            if row["Signal"] == "BUY":
-                return ["background-color: rgba(63, 185, 80, 0.2); color: #3fb950"] * len(row)
-            elif row["Signal"] == "SELL":
-                return ["background-color: rgba(248, 81, 73, 0.2); color: #f85149"] * len(row)
+        # Fungsi warna khusus kolom Signal yang anti-eror concat
+        def style_signal_column(val):
+            if val == "BUY":
+                return "background-color: rgba(63, 185, 80, 0.2); color: #3fb950; font-weight: bold;"
+            elif val == "SELL":
+                return "background-color: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold;"
             else:
-                return ["background-color: rgba(210, 153, 34, 0.2); color: #d29922"] * len(row)
+                return "background-color: rgba(210, 153, 34, 0.2); color: #d29922; font-weight: bold;"
 
-        # Menampilkan dataframe dengan gaya warna baru yang aman dari eror concat
-        st.dataframe(df.style.apply(color_signal, axis=1), use_container_width=True)
+        # Terapkan gaya hanya pada kolom 'Signal' menggunakan .map
+        styled_df = df.style.map(style_signal_column, subset=["Signal"])
+        st.dataframe(styled_df, use_container_width=True)
     else:
         st.warning("No data")
 
@@ -217,7 +218,7 @@ with tab4:
     ### Signal Logic
     - 🟢 BUY: RSI < 30 (oversold)
     - 🔴 SELL: RSI > 70 (overbought)  
-    - 🟡 HOLD: RSI 30-55
+    - 🟡 HOLD: RSI 30-70
     
     Educational only. Not financial advice.
     """)
