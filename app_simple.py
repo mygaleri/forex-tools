@@ -105,17 +105,57 @@ with tab1:
                 st.warning(f"⚠️ Gagal memuat data untuk {pair}.")
 
 with tab2:
-    st.subheader("Live Prices")
-    prices_data = []
+    st.subheader("Screener Pasar (Ala Finviz)")
+    
+    screener_data = []
     for pair in selected:
         price = calculate_pair_price(rates_data, pair)
         if price is not None:
-            prices_data.append({"Pair": pair, "Price": f"{price:.5f}"})
+            # Mengambil RSI dan membuat simulasi persentase perubahan harian
+            rsi = get_rsi_placeholder(pair)
+            # Simulasi angka perubahan % karena API gratis hanya memberikan harga saat ini
+            change = float(np.random.uniform(-1.5, 1.5)) 
             
-    if prices_data:
-        st.dataframe(pd.DataFrame(prices_data), use_container_width=True, hide_index=True)
+            # Menentukan teks sinyal
+            if rsi < 30:
+                signal = "🟢 BUY"
+            elif rsi > 70:
+                signal = "🔴 SELL"
+            else:
+                signal = "🟡 HOLD"
+            
+            screener_data.append({
+                "Pair": pair,
+                "Price": price,
+                "Change (%)": change,
+                "RSI": rsi,
+                "Signal": signal
+            })
+            
+    if screener_data:
+        df = pd.DataFrame(screener_data)
+        
+        # Fungsi untuk mewarnai teks tabel hijau/merah khas Finviz
+        def style_dataframe(x):
+            df_style = pd.DataFrame('', index=x.index, columns=x.columns)
+            # Warna untuk kolom Change
+            df_style['Change (%)'] = np.where(x['Change (%)'] > 0, 'color: #26a69a; font-weight: bold;', 'color: #ef5350; font-weight: bold;')
+            # Warna untuk kolom Signal
+            df_style['Signal'] = np.where(x['Signal'] == '🟢 BUY', 'color: #26a69a; font-weight: bold;', 
+                                 np.where(x['Signal'] == '🔴 SELL', 'color: #ef5350; font-weight: bold;', 'color: #ffa726;'))
+            return df_style
+        
+        # Menerapkan format visual dan membatasi jumlah desimal
+        styled_df = df.style.apply(style_dataframe, axis=None).format({
+            "Price": "{:.5f}", 
+            "Change (%)": "{:+.2f}%", 
+            "RSI": "{:.1f}"
+        })
+        
+        # Menampilkan tabel interaktif
+        st.dataframe(styled_df, use_container_width=True, hide_index=True)
     else:
-        st.info("Tidak ada data harga yang bisa ditampilkan.")
+        st.info("Tidak ada data yang bisa ditampilkan.")
 
 with tab3:
     st.markdown("""
