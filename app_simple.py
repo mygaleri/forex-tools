@@ -174,20 +174,16 @@ def fetch_rates():
     return rates
 
 @st.cache_data(ttl=60)
-def get_prices(rates):
-    if not rates or "USD" not in rates: return {}
-    usd, eur = rates.get("USD", {}), rates.get("EUR", {})
+def get_prices(rates=None):
+    """
+    Mengambil data harga real-time untuk SEMUA aset (Forex, Metals, Stocks)
+    langsung dari Yahoo Finance secara gratis.
+    """
     prices = {}
     
     for pair in ALL_ITEMS:
-        # 1. LOGIKAMETALS (DIKUNCI AGAR FLUKTUASI HALUS & RASIONAL)
-        if pair in METALS:
-            seed_drift = datetime.now().minute + sum(ord(c) for c in pair)
-            np.random.seed(seed_drift)
-            prices[pair] = BASE_PRICES[pair] * (1 + np.random.uniform(-0.0005, 0.0005))
-            
-        # 2. LOGIKA STOCKS (REAL-TIME VIA YAHOO FINANCE)
-        elif pair in STOCKS:
+        # 1. ATUR TICKER YAHOO FINANCE YANG SESUAI
+        if pair in STOCKS:
             ticker_map = {
                 "AAPL": "AAPL",
                 "TSLA": "TSLA",
@@ -195,21 +191,23 @@ def get_prices(rates):
                 "TLKM": "TLKM.JK"
             }
             ticker = ticker_map.get(pair, pair)
-            try:
-                stock = yf.Ticker(ticker)
-                prices[pair] = stock.fast_info.last_price
-            except:
-                prices[pair] = BASE_PRICES[pair]
-                
-        # 3. LOGIKA FOREX (LIVE VIA OPEN ER-API)
+            
+        elif pair in METALS:
+            # XAUUSD di Yahoo Finance dibaca sebagai XAUUSD=X (Spot Gold)
+            ticker = f"{pair}=X"
+            
         else:
-            base, quote = pair[:3], pair[3:]
-            try:
-                if base == "USD": prices[pair] = usd.get(quote)
-                elif quote == "USD": prices[pair] = 1.0 / usd.get(base) if usd.get(base) else None
-                elif base in eur and quote in eur: prices[pair] = eur[quote] / eur[base]
-                else: prices[pair] = usd.get(quote) / usd.get(base) if usd.get(base) and usd.get(quote) else None
-            except: prices[pair] = None
+            # Forex (misal EURUSD) di Yahoo Finance dibaca sebagai EURUSD=X
+            ticker = f"{pair}=X"
+            
+        # 2. AMBIL DATA LIVE DARI SERVER YAHOO
+        try:
+            stock = yf.Ticker(ticker)
+            prices[pair] = stock.fast_info.last_price
+        except:
+            # Jalur penyelamat jika koneksi internet/API sedang down
+            prices[pair] = BASE_PRICES.get(pair, 1.0)
+            
     return prices
 
 @st.cache_data(ttl=120)
