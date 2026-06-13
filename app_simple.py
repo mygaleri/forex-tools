@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-import yfinance as yf  # <--- Library Saham Real-Time
+import yfinance as yf
 import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -54,7 +54,7 @@ st.markdown("""
     border-bottom-right-radius: 16px;
 }
 
-/* LESTAFintech Glow Effect */
+/* LESTAtrade Glow Effect */
 .header h1 { 
     font-family: 'Orbitron', sans-serif; 
     font-size: 2.8em; 
@@ -153,61 +153,33 @@ STOCKS = ["AAPL", "TSLA", "BBCA", "TLKM"]
 
 ALL_ITEMS = FOREX_MAJORS + FOREX_MINORS + METALS + STOCKS
 
-# Harga dasar (Baseline) disesuaikan mendekati pasar riil terkini sebagai fallback aman
+# Harga cadangan (Fallback) jika internet bermasalah
 BASE_PRICES = {
-    "EURUSD": 1.08500, "GBPUSD": 1.26500, "USDJPY": 149.500, "USDCHF": 0.88500, "AUDUSD": 0.65500, "USDCAD": 1.36500, "NZDUSD": 0.60500,
-    "EURJPY": 162.500, "GBPJPY": 189.500, "EURGBP": 0.85500, "EURAUD": 1.65500, "EURCAD": 1.47500, "EURCHF": 0.95500, "GBPAUD": 1.93500, "GBPCAD": 1.72500,
+    "EURUSD": 1.0850, "GBPUSD": 1.2650, "USDJPY": 149.50, "USDCHF": 0.8850, "AUDUSD": 0.6550, "USDCAD": 1.3650, "NZDUSD": 0.6050,
+    "EURJPY": 162.50, "GBPJPY": 189.50, "EURGBP": 0.8550, "EURAUD": 1.6550, "EURCAD": 1.4750, "EURCHF": 0.9550, "GBPAUD": 1.9350, "GBPCAD": 1.7250,
     "XAUUSD": 2350.00, "XAGUSD": 29.20,
     "AAPL": 291.13, "TSLA": 406.43, "BBCA": 5925.0, "TLKM": 3720.0
 }
 
-# ==================== DATA FUNCTIONS ====================
+# ==================== DATA FUNCTIONS (FULL REAL-TIME YAHOO FINANCE) ====================
 @st.cache_data(ttl=60)
-def fetch_rates():
-    rates = {}
-    for base in ["USD", "EUR", "GBP"]:
-        try:
-            r = requests.get(f"https://open.er-api.com/v6/latest/{base}", timeout=10)
-            if r.status_code == 200:
-                rates[base] = r.json().get("rates", {})
-        except: continue
-    return rates
-
-@st.cache_data(ttl=60)
-def get_prices(rates=None):
-    """
-    Mengambil data harga real-time untuk SEMUA aset (Forex, Metals, Stocks)
-    langsung dari Yahoo Finance secara gratis.
-    """
+def get_prices():
     prices = {}
-    
     for pair in ALL_ITEMS:
-        # 1. ATUR TICKER YAHOO FINANCE YANG SESUAI
+        # Penyesuaian nama ticker agar dipahami oleh server Yahoo Finance
         if pair in STOCKS:
-            ticker_map = {
-                "AAPL": "AAPL",
-                "TSLA": "TSLA",
-                "BBCA": "BBCA.JK",  
-                "TLKM": "TLKM.JK"
-            }
+            ticker_map = {"AAPL": "AAPL", "TSLA": "TSLA", "BBCA": "BBCA.JK", "TLKM": "TLKM.JK"}
             ticker = ticker_map.get(pair, pair)
-            
         elif pair in METALS:
-            # XAUUSD di Yahoo Finance dibaca sebagai XAUUSD=X (Spot Gold)
-            ticker = f"{pair}=X"
-            
+            ticker = f"{pair}=X"  # Untuk Spot Gold (XAUUSD=X) dan Silver
         else:
-            # Forex (misal EURUSD) di Yahoo Finance dibaca sebagai EURUSD=X
-            ticker = f"{pair}=X"
+            ticker = f"{pair}=X"  # Untuk pasangan mata uang Forex (EURUSD=X)
             
-        # 2. AMBIL DATA LIVE DARI SERVER YAHOO
         try:
             stock = yf.Ticker(ticker)
             prices[pair] = stock.fast_info.last_price
         except:
-            # Jalur penyelamat jika koneksi internet/API sedang down
             prices[pair] = BASE_PRICES.get(pair, 1.0)
-            
     return prices
 
 @st.cache_data(ttl=120)
@@ -230,13 +202,10 @@ def get_rsi(pair):
     rsi = 100 - (100 / (1 + avg_g / avg_l))
     return max(0, min(100, rsi))
 
-# --- UPDATE LOGIKA RADAR RSI BARU (45 - 65) ---
 def get_signal(pair):
     rsi = get_rsi(pair)
-    if rsi < 45: 
-        return "BUY", rsi
-    elif rsi > 65: 
-        return "SELL", rsi
+    if rsi < 45: return "BUY", rsi
+    elif rsi > 65: return "SELL", rsi
     return "WAIT AND SEE", rsi
 
 def get_change(pair):
@@ -255,12 +224,10 @@ def fetch_live_market_news():
                 title = item.find('title').text if item.find('title') is not None else "Breaking Financial Movement"
                 link = item.find('link').text if item.find('link') is not None else "#"
                 pub_date = item.find('pubDate').text if item.find('pubDate') is not None else "Just Now"
-                if len(pub_date) > 16:
-                    pub_date = pub_date[:16]
+                if len(pub_date) > 16: pub_date = pub_date[:16]
                 news_list.append({"title": title, "link": link, "date": pub_date})
             return news_list[:12]
-    except:
-        return []
+    except: return []
     return []
 
 # ==================== SIDEBAR ====================
@@ -275,14 +242,13 @@ with st.sidebar:
 # ==================== MAIN PANEL ====================
 st.markdown(f'''
 <div class="header">
-    <h1>⚡ LESTAFintech</h1>
-    <p>Make your tools all pairs & multi-asset terminal</p>
+    <h1>⚡ LESTAtrade</h1>
+    <p>Market Analysis Filter</p>
     <div style="margin-top:12px;"><span class="live"><span class="dot"></span>LIVE TERMINAL</span> <span style="color:var(--dim);margin-left:12px;font-family:'JetBrains Mono';">{datetime.now().strftime('%d %b %Y %H:%M')}</span></div>
 </div>
 ''', unsafe_allow_html=True)
 
-rates = fetch_rates()
-prices = get_prices(rates)
+prices = get_prices()
 
 if not prices:
     st.error("❌ Failed to fetch structural live data market.")
@@ -322,12 +288,9 @@ with tab1:
                     color = "var(--green)" if sig=="BUY" else "var(--red)" if sig=="SELL" else "var(--yellow)"
                     badge_cls = "buy" if sig=="BUY" else "sell" if sig=="SELL" else "wait"
                     
-                    if pair in ["BBCA", "TLKM"]:
-                        price_fmt = f"Rp{price:,.0f}"
-                    elif pair in ["XAUUSD", "AAPL", "TSLA"]:
-                        price_fmt = f"${price:,.2f}"
-                    else:
-                        price_fmt = f"${price:,.5f}"
+                    if pair in ["BBCA", "TLKM"]: price_fmt = f"Rp{price:,.0f}"
+                    elif pair in ["XAUUSD", "AAPL", "TSLA", "XAGUSD"]: price_fmt = f"${price:,.2f}"
+                    else: price_fmt = f"${price:,.5f}"
                         
                     st.markdown(f'''
                     <div class="card" style="border-left-color:{color};">
@@ -367,21 +330,13 @@ with tab2:
             df = df[df["Category"] == filter_cat]
             
         def style_signal_column(val):
-            if val == "BUY":
-                return "background-color: rgba(63, 185, 80, 0.2); color: #3fb950; font-weight: bold;"
-            elif val == "SELL":
-                return "background-color: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold;"
-            else:
-                return "background-color: rgba(210, 153, 34, 0.2); color: #d29922; font-weight: bold;"
+            if val == "BUY": return "background-color: rgba(63, 185, 80, 0.2); color: #3fb950; font-weight: bold;"
+            elif val == "SELL": return "background-color: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold;"
+            else: return "background-color: rgba(210, 153, 34, 0.2); color: #d29922; font-weight: bold;"
 
         if not df.empty:
-            # Menggunakan .map() agar aman dan stabil di sistem tabel Pandas
             styled_df = df.style.map(style_signal_column, subset=["Signal"])
             st.dataframe(styled_df, use_container_width=True, hide_index=True)
-        else:
-            st.warning("No structural asset matches filters.")
-    else:
-        st.warning("No screener asset matrix data available.")
 
 # === TAB 3: LIVE MARKET NEWS ===
 with tab3:
@@ -395,19 +350,17 @@ with tab3:
                 <div class="news-date">⏰ Released: {news['date']} GMT</div>
             </div>
             ''', unsafe_allow_html=True)
-    else:
-        st.info("🔄 Connecting to world economic servers or market is closed. Click refresh button to retry.")
 
 # === TAB 4: INFO ===
 with tab4:
     st.markdown("""
-    ## ℹ️ About LESTAFintech Terminal
-    **LESTAFintech** - Professional Grade Multi-Asset Financial Technology Terminal.
+    ## ℹ️ About LESTAtrade Terminal
+    **LESTAtrade** - Professional Grade Multi-Asset Financial Technology Terminal.
     
     ### Covered Ecosystems
-    - **Metals:** Precious global commodities monitoring system (Gold & Silver).
+    - **Metals:** Precious global commodities monitoring system (Gold & Silver) - Connected Real-Time to Yahoo Finance.
     - **Stocks:** High-liquidity tech assets (Apple, Tesla) & bluechip national equities (BBCA, TLKM) - Connected Real-Time to Yahoo Finance.
-    - **Forex Core:** Full coverage of all major currency liquidity pairs and secondary cross matrices.
+    - **Forex Core:** Full coverage of all major currency liquidity pairs and secondary cross matrices - Connected Real-Time to Yahoo Finance.
     
     ### Signal Indicators Logic (Updated Range)
     - 🟢 **BUY**: RSI < 45 (Aggressive market dip entry logic).
