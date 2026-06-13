@@ -101,7 +101,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==================== CONFIG API FREECURRENCYAPI ====================
-FREE_CURRENCY_API_KEY = "MASUKKAN_KEY_FREECURRENCYAPI_MU"
+FREE_CURRENCY_API_KEY = "fca_live_EHKOh4EnmEMcwbsLrehPjq0Hg3q73rSSJXrfbRgV"
 
 # ==================== DATA FETCHING & CONVERSION ====================
 @st.cache_data(ttl=60)
