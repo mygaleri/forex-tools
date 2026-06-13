@@ -180,7 +180,18 @@ with tab2:
     
     if data:
         df = pd.DataFrame(data)
-        st.dataframe(df.style.apply(lambda x: f"background:rgba(63,185,80,0.2);color:#3fb950" if x=="BUY" else f"background:rgba(248,81,73,0.2);color:#f85149" if x=="SELL" else "background:rgba(210,153,34,0.2);color:#d29922" for x in df["Signal"]), use_container_width=True)
+        
+        # Fungsi pembantu untuk mewarnai baris berdasarkan status Sinyal
+        def color_signal(row):
+            if row["Signal"] == "BUY":
+                return ["background-color: rgba(63, 185, 80, 0.2); color: #3fb950"] * len(row)
+            elif row["Signal"] == "SELL":
+                return ["background-color: rgba(248, 81, 73, 0.2); color: #f85149"] * len(row)
+            else:
+                return ["background-color: rgba(210, 153, 34, 0.2); color: #d29922"] * len(row)
+
+        # Menampilkan dataframe dengan gaya warna baru yang aman dari eror concat
+        st.dataframe(df.style.apply(color_signal, axis=1), use_container_width=True)
     else:
         st.warning("No data")
 
