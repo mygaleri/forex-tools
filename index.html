@@ -1,77 +1,142 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Forex Tools — mygaleri</title>
-  <style>
-    :root{--bg:#f7fafc;--card:#fff;--accent:#1769aa;--muted:#6b7280}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;line-height:1.5;background:var(--bg);color:#0f172a;margin:0;padding:32px}
-    .wrap{max-width:900px;margin:0 auto}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
-    header h1{margin:0;font-size:1.4rem}
-    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:12px}
-    .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
-    .tool{padding:14px;border-radius:8px;border:1px solid #e6edf3;background:#fff}
-    .tool h3{margin:0 0 8px 0}
-    .btn{display:inline-block;padding:8px 12px;background:var(--accent);color:#fff;border-radius:6px;text-decoration:none}
-    footer{margin-top:28px;color:var(--muted);font-size:0.9rem;text-align:center}
-    .small{font-size:0.9rem;color:var(--muted)}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader Ritel - Forex Tools & Education Hub</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0e1117;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #1f2937, #111827);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+            border: 1px solid #374151;
+        }
+        h1 {
+            color: #26a69a;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        p.subtitle {
+            color: #9ca3af;
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+        .cta-btn {
+            display: inline-block;
+            background-color: #26a69a;
+            color: white;
+            padding: 14px 32px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(38, 166, 154, 0.4);
+        }
+        .cta-btn:hover {
+            background-color: #2bbbad;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(38, 166, 154, 0.6);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: left;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #26a69a;
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #ffa726;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+        .card p {
+            color: #9ca3af;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background-color: rgba(38, 166, 154, 0.1);
+            color: #26a69a;
+            margin-bottom: 15px;
+        }
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            border-top: 1px solid #374151;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <rect width="24" height="24" rx="6" fill="#1769aa"/>
-        <path d="M6 16l3-6 3 4 3-8 3 10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <div>
-        <h1>Forex Tools</h1>
-        <div class="small">Kumpulan alat sederhana untuk melihat kurs dan konversi mata uang.</div>
-      </div>
-    </header>
 
-    <section class="card">
-      <p>Selamat datang di Forex Tools. Pilih salah satu alat di bawah untuk mulai mencoba.</p>
-      <div class="tools">
-        <a class="tool" href="./converter.html">
-          <h3>Konverter Mata Uang</h3>
-          <p class="small">Konversi dari satu mata uang ke mata uang lain.</p>
-          <div style="margin-top:8px"><span class="btn">Buka</span></div>
-        </a>
+    <div class="container">
+        <header>
+            <h1>🏦 Trader Ritel Education Hub</h1>
+            <p class="subtitle">Platform Edukasi & Alat Bantu Analisis Pasar Forex Modern</p>
+            <a href="https://forex-tools-allpairs.streamlit.app/" target="_blank" class="cta-btn">🚀 Masuk ke Aplikasi Live Screener</a>
+        </header>
 
-        <a class="tool" href="./rates.html">
-          <h3>Live Rates (statik)</h3>
-          <p class="small">Tampilan kurs populer (USD, EUR, IDR, JPY).</p>
-          <div style="margin-top:8px"><span class="btn">Buka</span></div>
-        </a>
-
-        <a class="tool" href="https://github.com/mygaleri/forex-tools" target="_blank" rel="noopener" class="tool">
-          <h3>Repository</h3>
-          <p class="small">Lihat kode sumber atau kontribusi di GitHub.</p>
-          <div style="margin-top:8px"><span class="btn">GitHub</span></div>
-        </a>
-
-        <div class="tool">
-          <h3>Dokumentasi</h3>
-          <p class="small">Deskripsi singkat penggunaan dan lisensi proyek.</p>
-          <div style="margin-top:8px"><a class="btn" href="./README.html">Lihat</a></div>
+        <div class="grid">
+            <div class="card">
+                <div class="badge">📊 AUTOMATED SIGNALS</div>
+                <h3>Trading Signals</h3>
+                <p>Analisis kekuatan arah tren pasar secara otomatis menggunakan indikator kalkulasi RSI untuk mendeteksi area jenuh beli (Overbought) dan jenuh jual (Oversold).</p>
+            </div>
+            
+            <div class="card">
+                <div class="badge">💹 MATRIX VIEW</div>
+                <h3>Market Screener Premium</h3>
+                <p>Tampilan pemantauan banyak pasangan mata uang sekaligus dalam bentuk grid panel mewah ala Finviz. Memudahkan pemindaian kondisi pasar dalam hitungan detik.</p>
+            </div>
+            
+            <div class="card">
+                <div class="badge">📅 MACRO DATA</div>
+                <h3>Kalender Berita Ekonomi</h3>
+                <p>Jadwal rilis data fundamental penting dunia yang berdampak besar (High Impact) seperti CPI, NFP, dan FOMC untuk meminimalisir risiko terseret volatilitas tinggi.</p>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <section class="card">
-      <h2>Catatan</h2>
-      <ul>
-        <li class="small">Halaman ini statis; untuk data real‑time diperlukan API eksternal (mis. exchangerate.host, fixer.io, atau layanan lain).</li>
-        <li class="small">Jika Anda mau, saya bisa tambahkan halaman converter sederhana yang memanggil API gratis.</li>
-      </ul>
-    </section>
+        <footer>
+            <p>&copy; 2026 Trader Ritel Project. Dibuat khusus untuk media pembelajaran dan analisis risiko trading.</p>
+        </footer>
+    </div>
 
-    <footer>
-      Dibuat oleh <strong>@mygaleri</strong> · <span class="small">Source: <a href="https://github.com/mygaleri/forex-tools" target="_blank">github.com/mygaleri/forex-tools</a></span>
-    </footer>
-  </div>
 </body>
 </html>
