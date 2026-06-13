@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 # ==================== PAGE CONFIG ====================
-st.set_page_config(page_title="LESTAFintech", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="LESTAtrade", page_icon="⚡", layout="wide")
 
 # ==================== PREMIUM FINTECH DARK THEME CSS ====================
 st.markdown("""
