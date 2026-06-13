@@ -79,7 +79,7 @@ rates_data = get_all_forex_rates()
 tab1, tab2, tab3 = st.tabs(["📊 Signals", "💹 Prices", "ℹ️ Info"])
 
 with tab1:
-    st.subheader("Trading Signals")
+    st.subheader("Signals")
     if not selected:
         st.info("Select pairs from sidebar")
     else:
@@ -105,7 +105,7 @@ with tab1:
                 st.warning(f"⚠️ Gagal memuat data untuk {pair}.")
 
 with tab2:
-    st.subheader("Screener Pasar (Ala Finviz)")
+    st.subheader("Screener Market")
     
     screener_data = []
     for pair in selected:
