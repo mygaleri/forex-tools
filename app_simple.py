@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 st.set_page_config(page_title="Forex Tools", layout="wide")
-st.title("🏦 Forex Trading Tools (ExchangeRate-API)")
+st.title("Forex Trading Tools (All Pairs)")
 
 PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "USDCHF", "AUDUSD", "USDCAD", "NZDUSD"]
 
