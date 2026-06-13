@@ -148,7 +148,7 @@ with tab1:
         </div>
         ''', unsafe_allow_html=True)
         
-        for pair, signal, rsi in signals:
+        for pair, (signal, rsi) in signals:
             price = prices.get(pair)
             if not price: continue
             chg = get_change(pair)
@@ -208,9 +208,5 @@ with tab4:
     - 🔴 SELL: RSI > 70 (overbought)  
     - 🟡 HOLD: RSI 30-55
     
-     Educational only. Not financial advice.
+    Educational only. Not financial advice.
     """)
-
-# ==================== RUN ====================
-if __name__ == "__main__":
-    st.run()
