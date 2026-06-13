@@ -135,7 +135,7 @@ with tab1:
     if not selected:
         st.info("Select pairs from sidebar")
     else:
-        signals = [(p, *get_signal(p)) for p in selected]
+        signals = [(p, get_signal(p)) for p in selected]
         buy = sum(1 for _,s in signals if s[0]=="BUY")
         sell = sum(1 for _,s in signals if s[0]=="SELL")
         hold = sum(1 for _,s in signals if s[0]=="HOLD")
