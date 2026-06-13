@@ -105,57 +105,59 @@ with tab1:
                 st.warning(f"⚠️ Gagal memuat data untuk {pair}.")
 
 with tab2:
-    st.subheader("Screener Market")
+    st.subheader("Market Screener)")
     
-    screener_data = []
-    for pair in selected:
-        price = calculate_pair_price(rates_data, pair)
-        if price is not None:
-            # Mengambil RSI dan membuat simulasi persentase perubahan harian
-            rsi = get_rsi_placeholder(pair)
-            # Simulasi angka perubahan % karena API gratis hanya memberikan harga saat ini
-            change = float(np.random.uniform(-1.5, 1.5)) 
-            
-            # Menentukan teks sinyal
-            if rsi < 30:
-                signal = "🟢 BUY"
-            elif rsi > 70:
-                signal = "🔴 SELL"
-            else:
-                signal = "🟡 HOLD"
-            
-            screener_data.append({
-                "Pair": pair,
-                "Price": price,
-                "Change (%)": change,
-                "RSI": rsi,
-                "Signal": signal
-            })
-            
-    if screener_data:
-        df = pd.DataFrame(screener_data)
-        
-        # Fungsi untuk mewarnai teks tabel hijau/merah khas Finviz
-        def style_dataframe(x):
-            df_style = pd.DataFrame('', index=x.index, columns=x.columns)
-            # Warna untuk kolom Change
-            df_style['Change (%)'] = np.where(x['Change (%)'] > 0, 'color: #26a69a; font-weight: bold;', 'color: #ef5350; font-weight: bold;')
-            # Warna untuk kolom Signal
-            df_style['Signal'] = np.where(x['Signal'] == '🟢 BUY', 'color: #26a69a; font-weight: bold;', 
-                                 np.where(x['Signal'] == '🔴 SELL', 'color: #ef5350; font-weight: bold;', 'color: #ffa726;'))
-            return df_style
-        
-        # Menerapkan format visual dan membatasi jumlah desimal
-        styled_df = df.style.apply(style_dataframe, axis=None).format({
-            "Price": "{:.5f}", 
-            "Change (%)": "{:+.2f}%", 
-            "RSI": "{:.1f}"
-        })
-        
-        # Menampilkan tabel interaktif
-        st.dataframe(styled_df, use_container_width=True, hide_index=True)
+    if not selected:
+        st.info("Silakan pilih pasangan mata uang di menu samping.")
     else:
-        st.info("Tidak ada data yang bisa ditampilkan.")
+        # Membuat grid layout otomatis (3 kolom ke samping)
+        # Menyesuaikan agar responsif di layar HP maupun laptop Lenovo kamu
+        cols = st.columns(3)
+        
+        for index, pair in enumerate(selected):
+            price = calculate_pair_price(rates_data, pair)
+            if price is not None:
+                rsi = get_rsi_placeholder(pair)
+                change = float(np.random.uniform(-1.2, 1.2)) # Simulasi pergerakan %
+                
+                # Tentukan kolom mana kartu ini akan diletakkan (0, 1, atau 2)
+                col_target = cols[index % 3]
+                
+                with col_target:
+                    # Membuat kotak kontainer terisolasi agar terlihat seperti kartu terpisah
+                    with st.container(border=True):
+                        # Bagian Header Kartu
+                        st.markdown(f"### 💱 {pair}")
+                        
+                        # Logika warna dan simbol untuk perubahan harga (Mewah & Dinamis)
+                        if change > 0:
+                            change_text = f"▲ +{change:.2f}%"
+                            # Warna hijau neon khas platform trading global
+                            bg_color = "rgba(38, 166, 154, 0.1)" 
+                            border_color = "#26a69a"
+                        else:
+                            change_text = f"▼ {change:.2f}%"
+                            # Warna merah gelap transparan
+                            bg_color = "rgba(239, 83, 80, 0.1)"
+                            border_color = "#ef5350"
+                        
+                        # Menampilkan data utama dengan ukuran teks yang rapi
+                        st.metric(label="Harga Saat Ini", value=f"{price:.5f}", delta=change_text)
+                        
+                        # Progress bar mini untuk visualisasi kekuatan RSI (Sangat Finviz!)
+                        st.caption(f"Kekuatan RSI: {rsi:.1f}")
+                        st.progress(int(rsi))
+                        
+                        # Tampilan Sinyal di bagian bawah kartu dengan badge warna
+                        if rsi < 30:
+                            st.markdown(f"<span style='background-color:{bg_color}; color:{border_color}; padding:4px 12px; border-radius:12px; font-weight:bold;'>🟢 BUY</span>", unsafe_allow_html=True)
+                        elif rsi > 70:
+                            st.markdown(f"<span style='background-color:{bg_color}; color:{border_color}; padding:4px 12px; border-radius:12px; font-weight:bold;'>🔴 SELL</span>", unsafe_allow_html=True)
+                        else:
+                            st.markdown("<span style='background-color:rgba(255,167,38,0.1); color:#ffa726; padding:4px 12px; border-radius:12px; font-weight:bold;'>🟡 HOLD</span>", unsafe_allow_html=True)
+                        
+                        # Jarak aman antar baris kotak
+                        st.write("")
 
 with tab3:
     st.markdown("""
