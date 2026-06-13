@@ -69,10 +69,10 @@ st.markdown("""
 }
 
 /* Finviz Dynamic Color Coding classes */
-.strong-up { background-color: #007d2f; color: #ffffff; } /* Hijau Terang */
-.mild-up { background-color: #0b4d22; color: #e2e8f0; }   /* Hijau Gelap */
-.mild-down { background-color: #5c1616; color: #e2e8f0; } /* Merah Gelap */
-.strong-down { background-color: #aa1717; color: #ffffff; } /* Merah Terang */
+.strong-up { background-color: #007d2f; color: #ffffff; }
+.mild-up { background-color: #0b4d22; color: #e2e8f0; }  
+.mild-down { background-color: #5c1616; color: #e2e8f0; }
+.strong-down { background-color: #aa1717; color: #ffffff; }
 
 .box-pair {
     font-family: 'Orbitron', sans-serif;
@@ -93,7 +93,6 @@ st.markdown("""
     margin-top: 4px;
 }
 
-/* Fix Streamlit default padding */
 .block-container {
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
@@ -102,13 +101,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==================== CONFIG API FREECURRENCYAPI ====================
-# ⚠️ Ganti dengan API Key yang kamu dapatkan gratis dari freecurrencyapi.com
-FREE_CURRENCY_API_KEY = "fca_live_EHKOh4EnmEMcwbsLrehPjq0Hg3q73rSSJXrfbRgV"
+FREE_CURRENCY_API_KEY = "MASUKKAN_KEY_FREECURRENCYAPI_MU"
 
 # ==================== DATA FETCHING & CONVERSION ====================
 @st.cache_data(ttl=60)
 def get_finviz_forex_data():
-    """Mengambil data kurs mentah dan mengubahnya menjadi format pasangan mata uang internasional"""
     if FREE_CURRENCY_API_KEY == "MASUKKAN_KEY_FREECURRENCYAPI_MU":
         return None
         
@@ -118,8 +115,6 @@ def get_finviz_forex_data():
         response = requests.get(url, timeout=7)
         if response.status_code == 200:
             raw_data = response.json().get("data", {})
-            
-            # Rumus matematika konversi mata uang berbasis USD
             raw_prices = {
                 "EURUSD": 1.0 / raw_data["EUR"] if "EUR" in raw_data else 1.085,
                 "GBPUSD": 1.0 / raw_data["GBP"] if "GBP" in raw_data else 1.265,
@@ -134,19 +129,16 @@ def get_finviz_forex_data():
                 "USDCNY": raw_data.get("CNY", 7.2400)
             }
             return raw_prices
-    except Exception as e:
+    except:
         pass
     return None
 
-# Generate perubahan persentase simulasi yang konsisten berdasarkan nama pair
 def get_deterministic_change(pair):
     seed = sum(ord(c)*(i+1) for i,c in enumerate(pair)) % 2**32
     np.random.seed(seed)
     return np.random.uniform(-1.2, 1.2)
 
 # ==================== MAIN RENDER ====================
-
-# Top Header Bar ala Finviz
 st.markdown(f'''
 <div class="matrix-header">
     <div>
@@ -160,58 +152,43 @@ st.markdown(f'''
 </div>
 ''', unsafe_allow_html=True)
 
-# Fetch Data
 prices = get_finviz_forex_data()
 
-# Error handler jika API Key belum dipasang
 if prices is None:
     st.warning("🔑 **API Key Belum Valid:** Menampilkan mode simulasi visual grid Finviz. Silakan masukkan API Key asli dari freecurrencyapi.com pada baris kode ke-67 agar data riil terhubung.")
-    # Fallback Data Simulasi agar dashboard tetap tampil cantik saat setup
     prices = {
         "EURUSD": 1.08521, "GBPUSD": 1.26415, "AUDUSD": 0.65412, "NZDUSD": 0.60551,
         "USDJPY": 149.52, "USDCHF": 0.8841, "USDCAD": 1.3625, "USDIDR": 16245.0,
         "USDMYR": 4.712, "USDSGD": 1.3445, "USDCNY": 7.2415
     }
 
-# Membagi Tampilan Berdasarkan Sinyal Naik/Turun
 st.markdown("### 🗺️ Forex Performance Heatmap Grid")
 
-# Memulai pembuatan string HTML Grid
+# Memulai perakitan HTML tanpa spasi menonjol di baris baru
 grid_html = '<div class="finviz-grid">'
 
 for pair, price in prices.items():
     chg = get_deterministic_change(pair)
     
-    # Menentukan kelas warna Finviz berdasarkan nilai performa persentase
-    if chg >= 0.6:
-        bg_class = "strong-up"
-    elif 0 <= chg < 0.6:
-        bg_class = "mild-up"
-    elif -0.6 < chg < 0:
-        bg_class = "mild-down"
-    else:
-        bg_class = "strong-down"
+    if chg >= 0.6: bg_class = "strong-up"
+    elif 0 <= chg < 0.6: bg_class = "mild-up"
+    elif -0.6 < chg < 0: bg_class = "mild-down"
+    else: bg_class = "strong-down"
         
-    # Format desimal: IDR ratusan/ribuan tanpa koma panjang, forex biasa 4-5 angka di belakang koma
-    if "IDR" in pair:
-        price_fmt = f"Rp{price:,.1f}"
-    elif "JPY" in pair:
-        price_fmt = f"{price:.2f}"
-    else:
-        price_fmt = f"{price:.5f}"
+    if "IDR" in pair: price_fmt = f"Rp{price:,.1f}"
+    elif "JPY" in pair: price_fmt = f"{price:.2f}"
+    else: price_fmt = f"{price:.5f}"
         
-    # Merakit kotak komponen Finviz
-    grid_html += f'''
-    <div class="finviz-box {bg_class}">
-        <div class="box-pair">{pair}</div>
-        <div class="box-price">{price_fmt}</div>
-        <div class="box-change">{"+" if chg >= 0 else ""}{chg:.2f}%</div>
-    </div>
-    '''
+    # BAGIAN FIX: Semua digabung rapat satu baris agar tidak memicu deteksi markdown code block
+    grid_html += f'<div class="finviz-box {bg_class}">'
+    grid_html += f'<div class="box-pair">{pair}</div>'
+    grid_html += f'<div class="box-price">{price_fmt}</div>'
+    grid_html += f'<div class="box-change">{"+" if chg >= 0 else ""}{chg:.2f}%</div>'
+    grid_html += '</div>'
 
 grid_html += '</div>'
 
-# Cetak Grid ke Layar Streamlit
+# Eksekusi HTML
 st.markdown(grid_html, unsafe_allow_html=True)
 
 # ==================== BOTTOM UTILITY ====================
