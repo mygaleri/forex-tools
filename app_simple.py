@@ -103,7 +103,7 @@ st.markdown("""
 
 # ==================== CONFIG API FREECURRENCYAPI ====================
 # ⚠️ Ganti dengan API Key yang kamu dapatkan gratis dari freecurrencyapi.com
-FREE_CURRENCY_API_KEY = "MASUKKAN_KEY_FREECURRENCYAPI_MU"
+FREE_CURRENCY_API_KEY = "fca_live_EHKOh4EnmEMcwbsLrehPjq0Hg3q73rSSJXrfbRgV"
 
 # ==================== DATA FETCHING & CONVERSION ====================
 @st.cache_data(ttl=60)
