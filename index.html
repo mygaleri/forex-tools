@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Forex Tools — mygaleri</title>
+  <style>
+    :root{--bg:#f7fafc;--card:#fff;--accent:#1769aa;--muted:#6b7280}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;line-height:1.5;background:var(--bg);color:#0f172a;margin:0;padding:32px}
+    .wrap{max-width:900px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    header h1{margin:0;font-size:1.4rem}
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.06);margin-bottom:12px}
+    .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+    .tool{padding:14px;border-radius:8px;border:1px solid #e6edf3;background:#fff}
+    .tool h3{margin:0 0 8px 0}
+    .btn{display:inline-block;padding:8px 12px;background:var(--accent);color:#fff;border-radius:6px;text-decoration:none}
+    footer{margin-top:28px;color:var(--muted);font-size:0.9rem;text-align:center}
+    .small{font-size:0.9rem;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <rect width="24" height="24" rx="6" fill="#1769aa"/>
+        <path d="M6 16l3-6 3 4 3-8 3 10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Forex Tools</h1>
+        <div class="small">Kumpulan alat sederhana untuk melihat kurs dan konversi mata uang.</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <p>Selamat datang di Forex Tools. Pilih salah satu alat di bawah untuk mulai mencoba.</p>
+      <div class="tools">
+        <a class="tool" href="./converter.html">
+          <h3>Konverter Mata Uang</h3>
+          <p class="small">Konversi dari satu mata uang ke mata uang lain.</p>
+          <div style="margin-top:8px"><span class="btn">Buka</span></div>
+        </a>
+
+        <a class="tool" href="./rates.html">
+          <h3>Live Rates (statik)</h3>
+          <p class="small">Tampilan kurs populer (USD, EUR, IDR, JPY).</p>
+          <div style="margin-top:8px"><span class="btn">Buka</span></div>
+        </a>
+
+        <a class="tool" href="https://github.com/mygaleri/forex-tools" target="_blank" rel="noopener" class="tool">
+          <h3>Repository</h3>
+          <p class="small">Lihat kode sumber atau kontribusi di GitHub.</p>
+          <div style="margin-top:8px"><span class="btn">GitHub</span></div>
+        </a>
+
+        <div class="tool">
+          <h3>Dokumentasi</h3>
+          <p class="small">Deskripsi singkat penggunaan dan lisensi proyek.</p>
+          <div style="margin-top:8px"><a class="btn" href="./README.html">Lihat</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Catatan</h2>
+      <ul>
+        <li class="small">Halaman ini statis; untuk data real‑time diperlukan API eksternal (mis. exchangerate.host, fixer.io, atau layanan lain).</li>
+        <li class="small">Jika Anda mau, saya bisa tambahkan halaman converter sederhana yang memanggil API gratis.</li>
+      </ul>
+    </section>
+
+    <footer>
+      Dibuat oleh <strong>@mygaleri</strong> · <span class="small">Source: <a href="https://github.com/mygaleri/forex-tools" target="_blank">github.com/mygaleri/forex-tools</a></span>
+    </footer>
+  </div>
+</body>
+</html>
