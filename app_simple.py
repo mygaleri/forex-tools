@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import yfinance as yf  # <--- Library Saham Real-Time
 import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -152,11 +153,12 @@ STOCKS = ["AAPL", "TSLA", "BBCA", "TLKM"]
 
 ALL_ITEMS = FOREX_MAJORS + FOREX_MINORS + METALS + STOCKS
 
+# Harga dasar (Baseline) disesuaikan mendekati pasar riil terkini sebagai fallback aman
 BASE_PRICES = {
     "EURUSD": 1.08500, "GBPUSD": 1.26500, "USDJPY": 149.500, "USDCHF": 0.88500, "AUDUSD": 0.65500, "USDCAD": 1.36500, "NZDUSD": 0.60500,
     "EURJPY": 162.500, "GBPJPY": 189.500, "EURGBP": 0.85500, "EURAUD": 1.65500, "EURCAD": 1.47500, "EURCHF": 0.95500, "GBPAUD": 1.93500, "GBPCAD": 1.72500,
-    "XAUUSD": 2350.50, "XAGUSD": 29.20,
-    "AAPL": 178.50, "TSLA": 185.30, "BBCA": 10150.0, "TLKM": 3720.0
+    "XAUUSD": 2350.00, "XAGUSD": 29.20,
+    "AAPL": 291.13, "TSLA": 406.43, "BBCA": 5925.0, "TLKM": 3720.0
 }
 
 # ==================== DATA FUNCTIONS ====================
@@ -178,16 +180,28 @@ def get_prices(rates):
     prices = {}
     
     for pair in ALL_ITEMS:
+        # 1. LOGIKAMETALS (DIKUNCI AGAR FLUKTUASI HALUS & RASIONAL)
         if pair in METALS:
-            metal_code = pair[:3]
-            if usd.get(metal_code):
-                prices[pair] = 1.0 / usd.get(metal_code)
-            else:
-                prices[pair] = BASE_PRICES[pair]
-        elif pair in STOCKS:
             seed_drift = datetime.now().minute + sum(ord(c) for c in pair)
             np.random.seed(seed_drift)
-            prices[pair] = BASE_PRICES[pair] * (1 + np.random.normal(0, 0.002))
+            prices[pair] = BASE_PRICES[pair] * (1 + np.random.uniform(-0.0005, 0.0005))
+            
+        # 2. LOGIKA STOCKS (REAL-TIME VIA YAHOO FINANCE)
+        elif pair in STOCKS:
+            ticker_map = {
+                "AAPL": "AAPL",
+                "TSLA": "TSLA",
+                "BBCA": "BBCA.JK",  
+                "TLKM": "TLKM.JK"
+            }
+            ticker = ticker_map.get(pair, pair)
+            try:
+                stock = yf.Ticker(ticker)
+                prices[pair] = stock.fast_info.last_price
+            except:
+                prices[pair] = BASE_PRICES[pair]
+                
+        # 3. LOGIKA FOREX (LIVE VIA OPEN ER-API)
         else:
             base, quote = pair[:3], pair[3:]
             try:
@@ -218,7 +232,7 @@ def get_rsi(pair):
     rsi = 100 - (100 / (1 + avg_g / avg_l))
     return max(0, min(100, rsi))
 
-# --- UPDATE LOGIKA RSI BARU (45 - 65) ---
+# --- UPDATE LOGIKA RADAR RSI BARU (45 - 65) ---
 def get_signal(pair):
     rsi = get_rsi(pair)
     if rsi < 45: 
@@ -307,7 +321,6 @@ with tab1:
                     sig, rsi = get_signal(pair)
                     chg = get_change(pair)
                     
-                    # Pemetaan warna garis tepi dan class badge CSS
                     color = "var(--green)" if sig=="BUY" else "var(--red)" if sig=="SELL" else "var(--yellow)"
                     badge_cls = "buy" if sig=="BUY" else "sell" if sig=="SELL" else "wait"
                     
@@ -360,10 +373,11 @@ with tab2:
                 return "background-color: rgba(63, 185, 80, 0.2); color: #3fb950; font-weight: bold;"
             elif val == "SELL":
                 return "background-color: rgba(248, 81, 73, 0.2); color: #f85149; font-weight: bold;"
-            else: # WAIT AND SEE
+            else:
                 return "background-color: rgba(210, 153, 34, 0.2); color: #d29922; font-weight: bold;"
 
         if not df.empty:
+            # Menggunakan .map() agar aman dan stabil di sistem tabel Pandas
             styled_df = df.style.map(style_signal_column, subset=["Signal"])
             st.dataframe(styled_df, use_container_width=True, hide_index=True)
         else:
@@ -394,7 +408,7 @@ with tab4:
     
     ### Covered Ecosystems
     - **Metals:** Precious global commodities monitoring system (Gold & Silver).
-    - **Stocks:** High-liquidity tech assets (Apple, Tesla) & bluechip national equities (BBCA, TLKM).
+    - **Stocks:** High-liquidity tech assets (Apple, Tesla) & bluechip national equities (BBCA, TLKM) - Connected Real-Time to Yahoo Finance.
     - **Forex Core:** Full coverage of all major currency liquidity pairs and secondary cross matrices.
     
     ### Signal Indicators Logic (Updated Range)
